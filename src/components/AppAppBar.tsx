@@ -1,4 +1,5 @@
 import * as React from 'react';
+// Link as RouterLink,
 import { useNavigate, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -12,7 +13,9 @@ import Drawer from '@mui/material/Drawer';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import ColorModeIconDropdown from '../shared-theme/ColorModeIconDropdown';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
+// import ColorModeIconDropdown from '../shared-theme/ColorModeIconDropdown';
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: 'grid',
@@ -26,6 +29,7 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 }));
 
 export default function AppAppBar() {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = React.useState(false);
@@ -75,13 +79,13 @@ export default function AppAppBar() {
 
   // Configuração dos itens do menu
   const menuItems = [
-    { label: 'Home', path: '/', sectionId: 'home', disabled: false },
-    { label: 'Resume', path: '/resume', sectionId: 'resume', disabled: false },
-    { label: 'Research', path: '/research', disabled: false },
-    { label: 'Publications', path: '/publications', disabled: false },
-    { label: 'Advised Students ', path: '/advised', disabled: false },
-    { label: 'Courses', path: '/courses', disabled: false },
-    { label: 'Contact', path: '/', sectionId: 'contact', disabled: false },
+    { label: t('nav.home'), path: '/', sectionId: 'home', disabled: false },
+    { label: t('nav.resume'), path: '/resume', sectionId: 'resume', disabled: false },
+    { label: t('nav.research'), path: '/research', disabled: false },
+    { label: t('nav.publications'), path: '/publications', disabled: false },
+    { label: t('nav.students'), path: '/advised', disabled: false },
+    { label: t('nav.courses'), path: '/courses', disabled: false },
+    { label: t('nav.contact'), path: '/', sectionId: 'contact', disabled: false },
   ];
 
   // Itens ativos (não desabilitados)
@@ -116,26 +120,45 @@ export default function AppAppBar() {
             justifyContent: 'center',
           }}
         >
-          {activeMenuItems.map((item) => (
-            <Button 
-              key={item.label}
-              color="inherit" 
-              sx={{ 
-                textTransform: 'none',
-                fontWeight: isActive(item.path) && !item.sectionId ? 'bold' : 'normal',
-                borderBottom: isActive(item.path) && !item.sectionId ? '2px solid' : 'none',
-                borderRadius: 0,
-                '&:hover': {
-                  borderBottom: '2px solid',
-                },
-                opacity: item.disabled ? 0.5 : 1,
-              }}
-              onClick={() => handleNavigation(item.path, item.sectionId)}
-              disabled={item.disabled}
-            >
-              {item.label}
-            </Button>
-          ))}
+          {activeMenuItems.map((item) => {
+            const buttonSx = {
+              textTransform: 'none',
+              fontWeight: isActive(item.path) && !item.sectionId ? 'bold' : 'normal',
+              borderBottom: isActive(item.path) && !item.sectionId ? '2px solid' : 'none',
+              borderRadius: 0,
+              '&:hover': {
+                borderBottom: '2px solid',
+              },
+              opacity: item.disabled ? 0.5 : 1,
+            };
+
+            // if (item.useLink) {
+            //   return (
+            //     <Button
+            //       key={item.label}
+            //       component={RouterLink}
+            //       to={item.path}
+            //       color="inherit"
+            //       sx={buttonSx}
+            //       disabled={item.disabled}
+            //     >
+            //       {item.label}
+            //     </Button>
+            //   );
+            // }
+
+            return (
+              <Button
+                key={item.label}
+                color="inherit"
+                sx={buttonSx}
+                onClick={() => handleNavigation(item.path, item.sectionId)}
+                disabled={item.disabled}
+              >
+                {item.label}
+              </Button>
+            );
+          })}
         </Box>
 
         {/* Direita */}
@@ -148,7 +171,8 @@ export default function AppAppBar() {
           }}
         >
           {/* Escolha de tema */}
-          <ColorModeIconDropdown />
+          {/* <ColorModeIconDropdown /> */}
+          <LanguageSwitcher />
           <IconButton onClick={toggleDrawer(true)} sx={{ display: { xs: 'flex', md: 'none' } }}>
             <MenuIcon />
           </IconButton>
@@ -165,23 +189,42 @@ export default function AppAppBar() {
           </Box>
 
           <Typography variant="subtitle2" sx={{ px: 2, pt: 2, fontWeight: 'bold', color: 'text.secondary' }}>
-            Menu
+            {t('nav.menu')}
           </Typography>
           
-          {activeMenuItems.map((item) => (
-            <MenuItem 
-              key={item.label}
-              onClick={() => handleNavigation(item.path, item.sectionId)}
-              disabled={item.disabled}
-              sx={{
-                fontWeight: isActive(item.path) && !item.sectionId ? 'bold' : 'normal',
-                opacity: item.disabled ? 0.5 : 1,
-              }}
-            >
-              {item.label}
-              {item.disabled && " (Em breve)"}
-            </MenuItem>
-          ))}
+          {activeMenuItems.map((item) => {
+            const menuItemSx = {
+              fontWeight: isActive(item.path) && !item.sectionId ? 'bold' : 'normal',
+              opacity: item.disabled ? 0.5 : 1,
+            };
+
+            // if (item.useLink) {
+            //   return (
+            //     <MenuItem
+            //       key={item.label}
+            //       component={RouterLink}
+            //       to={item.path}
+            //       onClick={toggleDrawer(false)}
+            //       disabled={item.disabled}
+            //       sx={menuItemSx}
+            //     >
+            //       {item.label}
+            //     </MenuItem>
+            //   );
+            // }
+
+            return (
+              <MenuItem
+                key={item.label}
+                onClick={() => handleNavigation(item.path, item.sectionId)}
+                disabled={item.disabled}
+                sx={menuItemSx}
+              >
+                {item.label}
+                {item.disabled && ` (${t('nav.soon')})`}
+              </MenuItem>
+            );
+          })}
 
           <Divider sx={{ my: 2 }} />
         </Box>
